@@ -1,5 +1,3 @@
-from textnode import TextNode
-
 
 def main():
     
