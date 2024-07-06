@@ -1,1 +1,2 @@
-python -m unittest discover -s src
+export PYTHONPATH=src
+python -m unittest discover -s tests
