@@ -51,7 +51,6 @@ def split_nodes_image(old_node):
                 new_nodes.append(TextNode(node.text, TextType.TEXT))
     return new_nodes
 
-
 def split_nodes_markdown(old_node):
     new_nodes = []
     for node in old_node:
@@ -69,7 +68,13 @@ def split_nodes_markdown(old_node):
                 new_nodes.append(TextNode(node.text, TextType.TEXT))
     return new_nodes
 
-
+def markdown_to_blocks(markdown):
+    blocks = []
+    for line in markdown.split("\n"):
+        cleaned_line = line.strip()
+        if cleaned_line:
+            blocks.append(cleaned_line)
+    return blocks
 
     
 
