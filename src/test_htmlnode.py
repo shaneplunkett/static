@@ -1,6 +1,7 @@
 import unittest
 from htmlnode import HTMLNode, LeafNode, text_node_to_html_node
 from textnode import TextNode, TextType
+from enums import *
 
 class TestHTMLNode(unittest.TestCase):
     def test_html_props(self):
@@ -50,7 +51,7 @@ class TestTextNodeToHtmlNode(unittest.TestCase):
         self.assertEqual(html_node.props, {"href": "https://www.boot.dev"})
 
     def test_image_type_conversion(self):
-        node = TextNode("This is an image", TextType.IMAGES, "https://www.boot.dev")
+        node = TextNode("This is an image", TextType.IMAGE, "https://www.boot.dev")
         html_node = text_node_to_html_node(node)
         self.assertEqual(html_node.tag, "img")
         self.assertEqual(html_node.value, "")

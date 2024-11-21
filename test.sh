@@ -1,1 +1,1 @@
-python -m unittest discover -s src
+python -m pytest -v --tb=short --color=yes
