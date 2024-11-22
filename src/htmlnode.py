@@ -1,4 +1,6 @@
-from textnode import TextType
+from textnode import *
+from splitter import *
+from markdown import *
 from enums import *
 
 class HTMLNode:

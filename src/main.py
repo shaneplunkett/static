@@ -1,14 +1,23 @@
 import os
+import shutil
 from textnode import *
 from htmlnode import *
 from helper import *
 
+def copy_html():
+    script_dir = os.path.dirname(__file__)
+    os.chdir(script_dir)
+    if os.path.exists("../public"):
+        print(f"Deleting Old Files")
+        shutil.rmtree("../public")
+    print(f"Making New Public Directory")
+    print(f"Copying Files from Static to Public")
+    shutil.copytree("../static", "../public")
+
 def main():
-    # Try a test string
-    result = text_to_textnodes("Here's an ![image](url) with **bold** and a [link](url) and some `code`")
 
-    # Print the results
-    for node in result:
-        print(f"Text: {node.text}, Type: {node.text_type}, Url: {node.url}")
+    copy_html()
 
-main()
+
+if __name__ == "__main__":
+    main()

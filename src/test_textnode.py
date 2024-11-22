@@ -1,7 +1,8 @@
 import unittest
-from enums import TextType
-from textnode import TextNode
-
+from enums import *
+from textnode import *
+from htmlnode import *
+from splitter import *
 
 class TestTextNode(unittest.TestCase):
     def test_eq(self):

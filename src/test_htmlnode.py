@@ -1,6 +1,6 @@
 import unittest
 from htmlnode import HTMLNode, LeafNode, text_node_to_html_node
-from textnode import TextNode, TextType
+from textnode import TextNode
 from enums import *
 
 class TestHTMLNode(unittest.TestCase):
