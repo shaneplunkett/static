@@ -67,15 +67,40 @@ class TextBlockSplit(unittest.TestCase):
         self.assertEqual(output,expected)
 
 class TestBlockCheck(unittest.TestCase):
-    def test_block_check_heading(self):
-        block = "# This is a heading"
+    def test_block_check_heading1(self):
+        block = "# This is a heading 1"
         output = block_to_block_type(block)
-        self.assertEqual(output, BlockType.HEADING) 
+        self.assertEqual(output, BlockType.HEADING1) 
+        
+    def test_block_check_heading2(self):
+        block = "## This is a heading 2"
+        output = block_to_block_type(block)
+        self.assertEqual(output, BlockType.HEADING2)
+
+    def test_block_check_heading3(self):
+        block = "### This is a heading 3"
+        output = block_to_block_type(block)
+        self.assertEqual(output, BlockType.HEADING3) 
 
     def test_block_check_heading4(self):
-        block = "###### This is a heading"
+        block = "#### This is a heading 4"
         output = block_to_block_type(block)
-        self.assertEqual(output, BlockType.HEADING) 
+        self.assertEqual(output, BlockType.HEADING4) 
+
+    def test_block_check_heading5(self):
+        block = "##### This is a heading 5"
+        output = block_to_block_type(block)
+        self.assertEqual(output, BlockType.HEADING5)
+
+    def test_block_check_heading6(self):
+        block = "###### This is a heading 6"
+        output = block_to_block_type(block)
+        self.assertEqual(output, BlockType.HEADING6)
+
+    def test_block_check_not_heading(self):
+        block = "########### This is not a heading"
+        output = block_to_block_type(block)
+        self.assertEqual(output, BlockType.PARAGRAPH)
 
     def test_block_check_code(self):
         block = "```this is code```"
