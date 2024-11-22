@@ -6,4 +6,5 @@ venv/
 /.idea
 pyrightconfig.json
 public/
+.pytest_cache/
 .DS_Store
