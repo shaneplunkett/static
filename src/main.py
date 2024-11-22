@@ -1,3 +1,4 @@
+import os
 from textnode import *
 from htmlnode import *
 from helper import *

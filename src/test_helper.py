@@ -3,6 +3,7 @@ from helper import *
 from textnode import *
 from htmlnode import *
 from enums import *
+import textwrap
 
 class TestExtractMarkdownImages(unittest.TestCase):
     def test_extract_markdown_images(self):
@@ -113,19 +114,42 @@ class TestBlockCheck(unittest.TestCase):
         self.assertEqual(output, BlockType.QUOTE) 
         
     def test_block_check_unordered_list(self):
-        block = "* this is a list item/n* this is another list item"
-        output = block_to_block_type(block)
-        self.assertEqual(output, BlockType.UNORDERED_LIST)
-    
-    def test_block_check_unordered_list2(self):
-        block = "- this is a list item/n- this is another list item"
+        block = """* this is a list item
+        * this is another list item"""
         output = block_to_block_type(block)
         self.assertEqual(output, BlockType.UNORDERED_LIST)
 
+    def test_block_check_unordered_list_fail(self):
+        block = """* this is a list item
+        this is not another list item"""
+        output = block_to_block_type(block)
+        self.assertEqual(output, BlockType.PARAGRAPH)
+    
+    def test_block_check_unordered_list2(self):
+        block = """- this is a list item
+        - this is another list item"""
+        output = block_to_block_type(block)
+        self.assertEqual(output, BlockType.UNORDERED_LIST)
+        
+    def test_block_check_unordered_list2_fail(self):
+        block = """- this is a list item
+        this is not another list item"""
+        output = block_to_block_type(block)
+        self.assertEqual(output, BlockType.PARAGRAPH)
+
     def test_block_check_ordered_list(self):
-        block = "1. this is a list item/n2. this is another list item"
+        block = """1. this is a list item
+2. this is another list item
+3. this is a third list item"""
         output = block_to_block_type(block)
         self.assertEqual(output, BlockType.ORDERED_LIST)
+
+    def test_block_check_ordered_list_fail(self):
+        block = """1. this is a list item
+        2. this is another list item
+        4. this is a third list item"""
+        output = block_to_block_type(block)
+        self.assertEqual(output, BlockType.PARAGRAPH)
 
     def test_block_check_paragraph(self):
         block = "this is a boring old paragraph"

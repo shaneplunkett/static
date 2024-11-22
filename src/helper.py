@@ -79,20 +79,41 @@ def markdown_to_blocks(markdown):
 
 def block_to_block_type(block):
         if re.match(r"#+", block):
-        # TODO: Add  additional types for H1, H2, H3, etc. and add another shitty loop to tag em all out
-            return BlockType.HEADING
+            if re.match(r"^#{1}\s", block):
+                return BlockType.HEADING1
+            elif re.match(r"^#{2}\s", block):
+                return BlockType.HEADING2
+            elif re.match(r"^#{3}\s", block):
+                return BlockType.HEADING3
+            elif re.match(r"^#{4}\s", block):
+                return BlockType.HEADING4
+            elif re.match(r"^#{5}\s", block):
+                return BlockType.HEADING5
+            elif re.match(r"^#{6}\s", block):
+                return BlockType.HEADING6
+            else:
+                return BlockType.PARAGRAPH
         elif block.startswith("```") and block.endswith("```"):
             return BlockType.CODE
         elif re.match(r"> ", block):
-            # More shitty loops
             return BlockType.QUOTE
-        elif block.startswith("- ") or block.startswith("* "):
-            # Write a really annoying for loop splitting the block and checking if each line starts with a bullet point
+        elif re.match(r"^(?:\s*[-*+]\s.*(?:\n|$))+\Z", block):
             return BlockType.UNORDERED_LIST
         elif block.startswith("1. "): 
-            # Write another shitty for loop to check that the numbers increment by one
-            return BlockType.ORDERED_LIST
+            is_ordered_list = True
+            lines = block.strip().split("\n")
+            print(f"Printing lines: {lines}")
+            number = 1
+            for line in lines:
+                if line.startswith(f"{number}. "):
+                    number += 1
+                else:
+                    print(f"Line {line} does not start with {number}. ")
+                    is_ordered_list = False
+                    break
+            if is_ordered_list:
+                return BlockType.ORDERED_LIST
+            else:
+                return BlockType.PARAGRAPH
         else:
             return BlockType.PARAGRAPH
-
-
