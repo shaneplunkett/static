@@ -20,12 +20,14 @@ def extract_title(markdown):
         raise ValueError("No Header Found")
 
 def markdown_to_blocks(markdown):
-    blocks = []
-    for line in markdown.split("\n\n"):
-        cleaned_line = line.strip()
-        if cleaned_line:
-            blocks.append(cleaned_line)
-    return blocks
+    blocks = markdown.split("\n\n")
+    cleaned_blocks = []
+    for block in blocks:
+        if block == "":
+            continue
+        block = block.strip()
+        cleaned_blocks.append(block)
+    return cleaned_blocks
 
 def block_to_block_type(block):
         if re.match(r"#+", block):
@@ -47,7 +49,7 @@ def block_to_block_type(block):
             return BlockType.CODE
         elif re.match(r"> ", block):
             return BlockType.QUOTE
-        elif re.match(r"^(?:\s*[-*+]\s.*(?:\n|$))+\Z", block):
+        elif block.startswith("- ") or block.startswith("* ") or block.startswith("+ "):
             return BlockType.UNORDERED_LIST
         elif block.startswith("1. "): 
             is_ordered_list = True

@@ -11,7 +11,7 @@ class HTMLNode:
         self.props = props
 
     def to_html(self):
-        raise NotImplementedError
+        raise NotImplementedError("No to_html method on HTMLNode")
         
     def props_to_html(self):
         if self.props is None:
@@ -49,10 +49,13 @@ class ParentNode(HTMLNode):
             raise ValueError("Tag Missing")
         if self.children is None:
             raise ValueError("Children is Missing and Mandatory")
-        child_html = ""
+        children_html = ""
         for child in self.children:
-            child_html += child.to_html()
+            children_html += child.to_html()
         return f"<{self.tag}{self.props_to_html()}>{children_html}</{self.tag}>"
+
+    def __repr__(self):
+        return f"ParentNode({self.tag}, children: {self.children}, {self.props})"
 
 def text_node_to_html_node(text_node):
     match text_node.text_type:
@@ -79,50 +82,71 @@ def markdown_to_html_node(markdown):
        block_type = block_to_block_type(block) 
        match block_type:
         case BlockType.HEADING1:
-                html.append(HTMLNode(tag=HTMLType.HEADING1, children=text_to_children(block)))
+                html.append(ParentNode(tag=HTMLType.HEADING1.value, children=header_to_children(block)))
         case BlockType.HEADING2:
-                html.append(HTMLNode(tag=HTMLType.HEADING2, children=text_to_children(block)))
+                html.append(ParentNode(tag=HTMLType.HEADING2.value, children=header_to_children(block)))
         case BlockType.HEADING3:
-                html.append(HTMLNode(tag=HTMLType.HEADING3, children=text_to_children(block)))
+                html.append(ParentNode(tag=HTMLType.HEADING3.value, children=header_to_children(block)))
         case BlockType.HEADING4:
-                html.append(HTMLNode(tag=HTMLType.HEADING4, children=text_to_children(block)))
+                html.append(ParentNode(tag=HTMLType.HEADING4.value, children=header_to_children(block)))
         case BlockType.HEADING5:
-                html.append(HTMLNode(tag=HTMLType.HEADING5, children=text_to_children(block)))
+                html.append(ParentNode(tag=HTMLType.HEADING5.value, children=header_to_children(block)))
         case BlockType.HEADING6:
-                html.append(HTMLNode(tag=HTMLType.HEADING6, children=text_to_children(block)))
+                html.append(ParentNode(tag=HTMLType.HEADING6.value, children=header_to_children(block)))
         case BlockType.CODE:
-                pre_node = HTMLNode(tag=HTMLType.CODEPRE)
-                pre_node.children = [HTMLNode(tag=HTMLType.CODE, text=block)]
-                html.append(pre_node)
+                html.append(ParentNode(tag=HTMLType.CODEPRE.value, children=code_to_children(block)))
         case BlockType.QUOTE:
-                html.append(HTMLNode(tag=HTMLType.QUOTE, children=text_to_children(block)))
+                html.append(ParentNode(tag=HTMLType.QUOTE.value, children=quote_to_children(block)))
         case BlockType.UNORDERED_LIST:
-                pre_node = HTMLNode(tag=HTMLType.UNORDERED_LIST)
-                pre_node.children = text_to_list_children(block)
-                html.append(pre_node)
+                html.append(ParentNode(tag=HTMLType.UNORDERED_LIST.value, children=text_to_list_children(block)))
         case BlockType.ORDERED_LIST:
-                pre_node = HTMLNode(tag=HTMLType.ORDERED_LIST)
-                pre_node.children = text_to_list_children(block)
-                html.append(pre_node)
+                html.append(ParentNode(tag=HTMLType.ORDERED_LIST.value, children=text_to_list_children_ordered(block)))
         case BlockType.PARAGRAPH:
-                html.append(HTMLNode(tag=HTMLType.PARAGRAPH, children=text_to_children(block)))
-    return HTMLNode(tag=HTMLType.DIV, children=html)
+                html.append(ParentNode(tag=HTMLType.PARAGRAPH.value, children=text_to_children(block)))
+    return ParentNode(tag=HTMLType.DIV.value, children=html)
 
 def text_to_children(text):
     children = []
-    text_nodes = text_to_text_nodes(text)
+    text_nodes = text_to_textnodes(text)
     for text_node in text_nodes:
         children.append(text_node_to_html_node(text_node))
     return children
+
+def header_to_children(text):
+    cleaned_text = re.sub(r"^#+\s*", "", text) 
+    return text_to_children(cleaned_text)
+
+def quote_to_children(text):
+    cleaned_text = re.sub(r"^>\s*", "", text)
+    return text_to_children(cleaned_text)
+
+def code_to_children(text):
+    cleaned_text = text[3:]
+    children = text_to_children(cleaned_text)
+    code = ParentNode(tag=HTMLType.CODE.value, children=children)
+    return [code]
+
 
 def text_to_list_children(text):
     list_items = text.split("\n")
     list_item_nodes = []
     for item in list_items:
-        cleaned_item = re.sub(r"^[\-\*\+]\s+", "", item)
-        text_nodes = text_to_text_nodes(cleaned_item)
+        cleaned_item = re.sub(r"^\s*[\-\*\+]\s*", "", item).strip()
+        text_nodes = text_to_textnodes(cleaned_item)
         html_nodes = [text_node_to_html_node(node) for node in text_nodes]
-        li_node = HTMLNode(tag=HTMLType.LIST_ITEM, children=html_nodes)
+        li_node = ParentNode(tag=HTMLType.LIST_ITEM.value, children=html_nodes)
+        list_item_nodes.append(li_node)
+    return list_item_nodes
+
+
+def text_to_list_children_ordered(text):
+    list_items = text.split("\n")
+    list_item_nodes = []
+    for item in list_items:
+        cleaned_item = re.sub(r"\d+\.\s*", "", item).strip()
+        text_nodes = text_to_textnodes(cleaned_item)
+        html_nodes = [text_node_to_html_node(node) for node in text_nodes]
+        li_node = ParentNode(tag=HTMLType.LIST_ITEM.value, children=html_nodes)
         list_item_nodes.append(li_node)
     return list_item_nodes
 
