@@ -12,6 +12,12 @@ class TestExtractMarkdownImages(unittest.TestCase):
         images = extract_markdown_images(text)
         self.assertEqual(images, expected)
 
+class TestExtractMarkdownTitle(unittest.TestCase):
+    def test_extract_markdown_title(self):
+        text = "# This is a heading"
+        expected = "This is a heading"
+        title = extract_title(text)
+        self.assertEqual(title, expected)
 
 class TextExtractMarkdownLinks(unittest.TestCase):
     def test_extract_markdown_links(self):

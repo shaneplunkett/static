@@ -72,4 +72,59 @@ def text_node_to_html_node(text_node):
         case _:
             raise ValueError("Invalid Text Type")
 
+def markdown_to_html_node(markdown):
+    blocks = markdown_to_blocks(markdown)
+    html = []
+    for block in blocks:
+       block_type = block_to_block_type(block) 
+       match block_type:
+        case BlockType.HEADING1:
+                html.append(HTMLNode(tag=HTMLType.HEADING1, children=text_to_children(block)))
+        case BlockType.HEADING2:
+                html.append(HTMLNode(tag=HTMLType.HEADING2, children=text_to_children(block)))
+        case BlockType.HEADING3:
+                html.append(HTMLNode(tag=HTMLType.HEADING3, children=text_to_children(block)))
+        case BlockType.HEADING4:
+                html.append(HTMLNode(tag=HTMLType.HEADING4, children=text_to_children(block)))
+        case BlockType.HEADING5:
+                html.append(HTMLNode(tag=HTMLType.HEADING5, children=text_to_children(block)))
+        case BlockType.HEADING6:
+                html.append(HTMLNode(tag=HTMLType.HEADING6, children=text_to_children(block)))
+        case BlockType.CODE:
+                pre_node = HTMLNode(tag=HTMLType.CODEPRE)
+                pre_node.children = [HTMLNode(tag=HTMLType.CODE, text=block)]
+                html.append(pre_node)
+        case BlockType.QUOTE:
+                html.append(HTMLNode(tag=HTMLType.QUOTE, children=text_to_children(block)))
+        case BlockType.UNORDERED_LIST:
+                pre_node = HTMLNode(tag=HTMLType.UNORDERED_LIST)
+                pre_node.children = text_to_list_children(block)
+                html.append(pre_node)
+        case BlockType.ORDERED_LIST:
+                pre_node = HTMLNode(tag=HTMLType.ORDERED_LIST)
+                pre_node.children = text_to_list_children(block)
+                html.append(pre_node)
+        case BlockType.PARAGRAPH:
+                html.append(HTMLNode(tag=HTMLType.PARAGRAPH, children=text_to_children(block)))
+    return HTMLNode(tag=HTMLType.DIV, children=html)
+
+def text_to_children(text):
+    children = []
+    text_nodes = text_to_text_nodes(text)
+    for text_node in text_nodes:
+        children.append(text_node_to_html_node(text_node))
+    return children
+
+def text_to_list_children(text):
+    list_items = text.split("\n")
+    list_item_nodes = []
+    for item in list_items:
+        cleaned_item = re.sub(r"^[\-\*\+]\s+", "", item)
+        text_nodes = text_to_text_nodes(cleaned_item)
+        html_nodes = [text_node_to_html_node(node) for node in text_nodes]
+        li_node = HTMLNode(tag=HTMLType.LIST_ITEM, children=html_nodes)
+        list_item_nodes.append(li_node)
+    return list_item_nodes
+
+
 

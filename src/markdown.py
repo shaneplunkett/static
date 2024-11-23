@@ -12,6 +12,13 @@ def extract_markdown_links(text):
     links = re.findall(r"(?<!!)\[([^\[\]]*)\]\(([^\(\)]*)\)", text)
     return links
 
+def extract_title(markdown):
+    lines = markdown.split("\n")
+    for line in lines:
+        if re.match(r"^#{1}\s", line):
+            return line.strip("#").strip()
+        raise ValueError("No Header Found")
+
 def markdown_to_blocks(markdown):
     blocks = []
     for line in markdown.split("\n\n"):
