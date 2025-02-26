@@ -1,19 +1,29 @@
 import unittest
+
+from enums import TextType
 from htmlnode import HTMLNode, LeafNode, text_node_to_html_node
 from textnode import TextNode
-from enums import *
+
 
 class TestHTMLNode(unittest.TestCase):
     def test_html_props(self):
-        node = HTMLNode("yolo", "howdy", None,
-                        {"prop": "prop1", "href": "https://google.com.au"},
-                        )
-        self.assertEqual(node.props_to_html(), ' prop="prop1" href="https://google.com.au"',)
+        node = HTMLNode(
+            "yolo",
+            "howdy",
+            None,
+            {"prop": "prop1", "href": "https://google.com.au"},
+        )
+        self.assertEqual(
+            node.props_to_html(),
+            ' prop="prop1" href="https://google.com.au"',
+        )
+
 
 class TestLeafNode(unittest.TestCase):
     def test_leaf_values(self):
         node = LeafNode("p", "this is a paragraph of text")
-        self.assertEqual(node.to_html(), '<p>this is a paragraph of text</p>')
+        self.assertEqual(node.to_html(), "<p>this is a paragraph of text</p>")
+
 
 class TestTextNodeToHtmlNode(unittest.TestCase):
     def test_text_type_conversion(self):
@@ -42,7 +52,7 @@ class TestTextNodeToHtmlNode(unittest.TestCase):
         html_node = text_node_to_html_node(text_node)
         self.assertEqual(html_node.value, text)
         self.assertEqual(html_node.tag, "code")
-    
+
     def test_link_type_conversion(self):
         node = TextNode("This is a link", TextType.LINK, "https://www.boot.dev")
         html_node = text_node_to_html_node(node)
@@ -61,6 +71,5 @@ class TestTextNodeToHtmlNode(unittest.TestCase):
         )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
-

@@ -1,7 +1,9 @@
-from textnode import *
-from splitter import *
-from markdown import *
-from enums import *
+import re
+
+from enums import BlockType, HTMLType, TextType
+from markdown import block_to_block_type, markdown_to_blocks
+from splitter import text_to_textnodes
+
 
 class HTMLNode:
     def __init__(self, tag=None, value=None, children=None, props=None):
@@ -12,7 +14,7 @@ class HTMLNode:
 
     def to_html(self):
         raise NotImplementedError("No to_html method on HTMLNode")
-        
+
     def props_to_html(self):
         if self.props is None:
             return ""
@@ -57,6 +59,7 @@ class ParentNode(HTMLNode):
     def __repr__(self):
         return f"ParentNode({self.tag}, children: {self.children}, {self.props})"
 
+
 def text_node_to_html_node(text_node):
     match text_node.text_type:
         case TextType.TEXT:
@@ -70,40 +73,89 @@ def text_node_to_html_node(text_node):
         case TextType.LINK:
             return LeafNode("a", text_node.text, props={"href": text_node.url})
         case TextType.IMAGE:
-            return LeafNode("img", "", props={"src": text_node.url, "alt":
-                            text_node.text})
+            return LeafNode(
+                "img", "", props={"src": text_node.url, "alt": text_node.text}
+            )
         case _:
             raise ValueError("Invalid Text Type")
+
 
 def markdown_to_html_node(markdown):
     blocks = markdown_to_blocks(markdown)
     html = []
     for block in blocks:
-       block_type = block_to_block_type(block) 
-       match block_type:
-        case BlockType.HEADING1:
-                html.append(ParentNode(tag=HTMLType.HEADING1.value, children=header_to_children(block)))
-        case BlockType.HEADING2:
-                html.append(ParentNode(tag=HTMLType.HEADING2.value, children=header_to_children(block)))
-        case BlockType.HEADING3:
-                html.append(ParentNode(tag=HTMLType.HEADING3.value, children=header_to_children(block)))
-        case BlockType.HEADING4:
-                html.append(ParentNode(tag=HTMLType.HEADING4.value, children=header_to_children(block)))
-        case BlockType.HEADING5:
-                html.append(ParentNode(tag=HTMLType.HEADING5.value, children=header_to_children(block)))
-        case BlockType.HEADING6:
-                html.append(ParentNode(tag=HTMLType.HEADING6.value, children=header_to_children(block)))
-        case BlockType.CODE:
-                html.append(ParentNode(tag=HTMLType.CODEPRE.value, children=code_to_children(block)))
-        case BlockType.QUOTE:
-                html.append(ParentNode(tag=HTMLType.QUOTE.value, children=quote_to_children(block)))
-        case BlockType.UNORDERED_LIST:
-                html.append(ParentNode(tag=HTMLType.UNORDERED_LIST.value, children=text_to_list_children(block)))
-        case BlockType.ORDERED_LIST:
-                html.append(ParentNode(tag=HTMLType.ORDERED_LIST.value, children=text_to_list_children_ordered(block)))
-        case BlockType.PARAGRAPH:
-                html.append(ParentNode(tag=HTMLType.PARAGRAPH.value, children=text_to_children(block)))
+        block_type = block_to_block_type(block)
+        match block_type:
+            case BlockType.HEADING1:
+                html.append(
+                    ParentNode(
+                        tag=HTMLType.HEADING1.value, children=header_to_children(block)
+                    )
+                )
+            case BlockType.HEADING2:
+                html.append(
+                    ParentNode(
+                        tag=HTMLType.HEADING2.value, children=header_to_children(block)
+                    )
+                )
+            case BlockType.HEADING3:
+                html.append(
+                    ParentNode(
+                        tag=HTMLType.HEADING3.value, children=header_to_children(block)
+                    )
+                )
+            case BlockType.HEADING4:
+                html.append(
+                    ParentNode(
+                        tag=HTMLType.HEADING4.value, children=header_to_children(block)
+                    )
+                )
+            case BlockType.HEADING5:
+                html.append(
+                    ParentNode(
+                        tag=HTMLType.HEADING5.value, children=header_to_children(block)
+                    )
+                )
+            case BlockType.HEADING6:
+                html.append(
+                    ParentNode(
+                        tag=HTMLType.HEADING6.value, children=header_to_children(block)
+                    )
+                )
+            case BlockType.CODE:
+                html.append(
+                    ParentNode(
+                        tag=HTMLType.CODEPRE.value, children=code_to_children(block)
+                    )
+                )
+            case BlockType.QUOTE:
+                html.append(
+                    ParentNode(
+                        tag=HTMLType.QUOTE.value, children=quote_to_children(block)
+                    )
+                )
+            case BlockType.UNORDERED_LIST:
+                html.append(
+                    ParentNode(
+                        tag=HTMLType.UNORDERED_LIST.value,
+                        children=text_to_list_children(block),
+                    )
+                )
+            case BlockType.ORDERED_LIST:
+                html.append(
+                    ParentNode(
+                        tag=HTMLType.ORDERED_LIST.value,
+                        children=text_to_list_children_ordered(block),
+                    )
+                )
+            case BlockType.PARAGRAPH:
+                html.append(
+                    ParentNode(
+                        tag=HTMLType.PARAGRAPH.value, children=text_to_children(block)
+                    )
+                )
     return ParentNode(tag=HTMLType.DIV.value, children=html)
+
 
 def text_to_children(text):
     children = []
@@ -112,13 +164,16 @@ def text_to_children(text):
         children.append(text_node_to_html_node(text_node))
     return children
 
+
 def header_to_children(text):
-    cleaned_text = re.sub(r"^#+\s*", "", text) 
+    cleaned_text = re.sub(r"^#+\s*", "", text)
     return text_to_children(cleaned_text)
+
 
 def quote_to_children(text):
     cleaned_text = re.sub(r"^>\s*", "", text)
     return text_to_children(cleaned_text)
+
 
 def code_to_children(text):
     cleaned_text = text[3:]
@@ -149,6 +204,3 @@ def text_to_list_children_ordered(text):
         li_node = ParentNode(tag=HTMLType.LIST_ITEM.value, children=html_nodes)
         list_item_nodes.append(li_node)
     return list_item_nodes
-
-
-

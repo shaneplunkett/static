@@ -1,8 +1,8 @@
 import unittest
-from enums import *
-from textnode import *
-from htmlnode import *
-from splitter import *
+
+from enums import TextType
+from textnode import TextNode
+
 
 class TestTextNode(unittest.TestCase):
     def test_eq(self):
@@ -20,5 +20,6 @@ class TestTextNode(unittest.TestCase):
         node2 = TextNode("This is a text node that aint", TextType.BOLD)
         self.assertNotEqual(node, node2)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

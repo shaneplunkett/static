@@ -1,25 +1,30 @@
 import os
 import shutil
 from pathlib import Path
-from htmlnode import markdown_to_html_node, extract_title
+
+from htmlnode import markdown_to_html_node
+from markdown import extract_title
+
 
 def copy_html():
     script_dir = os.path.dirname(__file__)
     os.chdir(script_dir)
     if os.path.exists("../public"):
-        print(f"Deleting Old Files")
+        print("Deleting Old Files")
 
-def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path, base_path):
     for filename in os.listdir(dir_path_content):
         from_path = os.path.join(dir_path_content, filename)
         dest_path = os.path.join(dest_dir_path, filename)
         if os.path.isfile(from_path):
             dest_path = Path(dest_path).with_suffix(".html")
-            generate_page(from_path, template_path, dest_path)
+            generate_page(from_path, template_path, dest_path, base_path)
         else:
-            generate_pages_recursive(from_path, template_path, dest_path)
+            generate_pages_recursive(from_path, template_path, dest_path, base_path)
 
-def generate_page(from_path, template_path, dest_path):
+
+def generate_page(from_path, template_path, dest_path, base_path):
     print(f" * {from_path} {template_path} -> {dest_path}")
     from_file = open(from_path, "r")
     markdown_content = from_file.read()
@@ -33,7 +38,11 @@ def generate_page(from_path, template_path, dest_path):
     html = node.to_html()
 
     title = extract_title(markdown_content)
-    template = template.replace("{{ Title }}", title)
+    template = template.replace("{{ Title }}", title or "")
+
+    html = html.replace('href="/', f'href="{base_path}/')
+    html = html.replace('src="/', f'src="{base_path}/')
+
     template = template.replace("{{ Content }}", html)
 
     dest_dir_path = os.path.dirname(dest_path)
@@ -41,6 +50,7 @@ def generate_page(from_path, template_path, dest_path):
         os.makedirs(dest_dir_path, exist_ok=True)
     to_file = open(dest_path, "w")
     to_file.write(template)
+
 
 def copy_files_recursive(source_dir_path, dest_dir_path):
     if not os.path.exists(dest_dir_path):

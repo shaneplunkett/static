@@ -1,9 +1,9 @@
 import unittest
-from markdown import *
-from splitter import *
-from textnode import *
-from htmlnode import *
+
 from enums import BlockType
+from markdown import block_to_block_type, extract_markdown_links, extract_title
+from splitter import extract_markdown_images
+
 
 class TestExtractMarkdownImages(unittest.TestCase):
     def test_extract_markdown_images(self):
@@ -12,12 +12,14 @@ class TestExtractMarkdownImages(unittest.TestCase):
         images = extract_markdown_images(text)
         self.assertEqual(images, expected)
 
+
 class TestExtractMarkdownTitle(unittest.TestCase):
     def test_extract_markdown_title(self):
         text = "# This is a heading"
         expected = "This is a heading"
         title = extract_title(text)
         self.assertEqual(title, expected)
+
 
 class TextExtractMarkdownLinks(unittest.TestCase):
     def test_extract_markdown_links(self):
@@ -26,12 +28,13 @@ class TextExtractMarkdownLinks(unittest.TestCase):
         url = extract_markdown_links(text)
         self.assertEqual(url, expected)
 
+
 class TestBlockCheck(unittest.TestCase):
     def test_block_check_heading1(self):
         block = "# This is a heading 1"
         output = block_to_block_type(block)
-        self.assertEqual(output, BlockType.HEADING1) 
-        
+        self.assertEqual(output, BlockType.HEADING1)
+
     def test_block_check_heading2(self):
         block = "## This is a heading 2"
         output = block_to_block_type(block)
@@ -40,12 +43,12 @@ class TestBlockCheck(unittest.TestCase):
     def test_block_check_heading3(self):
         block = "### This is a heading 3"
         output = block_to_block_type(block)
-        self.assertEqual(output, BlockType.HEADING3) 
+        self.assertEqual(output, BlockType.HEADING3)
 
     def test_block_check_heading4(self):
         block = "#### This is a heading 4"
         output = block_to_block_type(block)
-        self.assertEqual(output, BlockType.HEADING4) 
+        self.assertEqual(output, BlockType.HEADING4)
 
     def test_block_check_heading5(self):
         block = "##### This is a heading 5"
@@ -65,34 +68,34 @@ class TestBlockCheck(unittest.TestCase):
     def test_block_check_code(self):
         block = "```this is code```"
         output = block_to_block_type(block)
-        self.assertEqual(output, BlockType.CODE) 
+        self.assertEqual(output, BlockType.CODE)
 
     def test_block_check_quote(self):
         block = "> this is a quote"
         output = block_to_block_type(block)
-        self.assertEqual(output, BlockType.QUOTE) 
-        
+        self.assertEqual(output, BlockType.QUOTE)
+
     def test_block_check_unordered_list(self):
         block = """* this is a list item
-        * this is another list item"""
+* this is another list item"""
         output = block_to_block_type(block)
         self.assertEqual(output, BlockType.UNORDERED_LIST)
 
     def test_block_check_unordered_list_fail(self):
         block = """* this is a list item
-        this is not another list item"""
+this is not another list item"""
         output = block_to_block_type(block)
         self.assertEqual(output, BlockType.PARAGRAPH)
-    
+
     def test_block_check_unordered_list2(self):
         block = """- this is a list item
-        - this is another list item"""
+- this is another list item"""
         output = block_to_block_type(block)
         self.assertEqual(output, BlockType.UNORDERED_LIST)
-        
+
     def test_block_check_unordered_list2_fail(self):
         block = """- this is a list item
-        this is not another list item"""
+this is not another list item"""
         output = block_to_block_type(block)
         self.assertEqual(output, BlockType.PARAGRAPH)
 
